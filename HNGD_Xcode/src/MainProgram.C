@@ -3,8 +3,8 @@
   It was developped by Florian Passelaigue, based on Evrard Lacroix's PhD work.
  
   The model development is described in
-  E. Lacroix, P.-C. A. Simon, A. T. Motta, and J. Almer, “Zirconium hydride precipitation and
-  dissolution kinetics in the hysteresis region in zirconium alloys,” ASTM (submitted), 2019.
+  E. Lacroix, P.-C. A. Simon, A. T. Motta, and J. Almer, Zirconium hydride precipitation and
+  dissolution kinetics in the hysteresis region in zirconium alloys, ASTM (submitted), 2019.
  
   The implementation. verification and validation of this code is described in chapter 2 of
   F. Passelaigue, "Hydride Nucleation-Growth-Dissolution model: implementation in BISON",
@@ -15,6 +15,9 @@
   NB: the file structure was changed and new classes were created since the MS thesis was written.
     Refer to the README file for more details
  */
+
+// It Worked...
+
 
 #include <vector>
 #include <cmath>
