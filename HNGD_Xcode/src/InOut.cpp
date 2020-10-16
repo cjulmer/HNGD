@@ -13,10 +13,12 @@ using namespace std;
 void InOut::getSettings(int nb, double* settings, string path_exec, string file_name)
 {
     ifstream inpset ;
-    inpset.open(path_exec + file_name);
+    string name = path_exec + file_name;
+    inpset.open(name.c_str());
     
     if(inpset.fail())
     {
+    	cout << name << endl;
         cout << "Setting file opening failed" << endl ;
         exit(1) ;
     }
@@ -36,7 +38,8 @@ void InOut::getSettings(int nb, double* settings, string path_exec, string file_
 void InOut::getPhysics(int nb, double* physics, string path_exec, string file_name)
 {
     ifstream inpphys ;
-    inpphys.open(path_exec + file_name);
+    string name = path_exec + file_name;
+    inpphys.open(name.c_str());
     
     if(inpphys.fail())
     {
@@ -55,10 +58,11 @@ void InOut::getPhysics(int nb, double* physics, string path_exec, string file_na
     inpphys.close();
 }
 
-vector<vector<double>> InOut::getThermalTreatment(string path_exec, string file_name)
+vector<vector<double> > InOut::getThermalTreatment(string path_exec, string file_name)
 {
     ifstream inptemp ;
-    inptemp.open (path_exec + file_name);
+    string name = path_exec + file_name;
+    inptemp.open (name.c_str());
     
     if(inptemp.fail())
     {
@@ -72,7 +76,7 @@ vector<vector<double>> InOut::getThermalTreatment(string path_exec, string file_
     
     vector<double> pos_temp(0) ;
     vector<double> time_temp(0) ;
-    vector<vector<double>> temp_inp(0) ;
+    vector<vector<double> > temp_inp(0) ;
     
     // Positions
     string line_pos ;
@@ -133,7 +137,7 @@ vector<vector<double>> InOut::getThermalTreatment(string path_exec, string file_
     // First vector contains the positions
     // Second vector contains the time stamps
     // The others contain the temperature values
-    vector<vector<double>> thermal_treatment(0) ;
+    vector<vector<double> > thermal_treatment(0) ;
     thermal_treatment.push_back(pos_temp) ;
     thermal_treatment.push_back(time_temp);
     for(int k=0; k<temp_inp.size(); k++)
@@ -142,10 +146,11 @@ vector<vector<double>> InOut::getThermalTreatment(string path_exec, string file_
     return thermal_treatment ;
 }
 
-vector<vector<double>> InOut::getICHydrogen(string path_exec, string file_name)
+vector<vector<double> > InOut::getICHydrogen(string path_exec, string file_name)
 {
     ifstream inphyd;
-    inphyd.open(path_exec + file_name);
+    string name = path_exec + file_name;
+    inphyd.open(name.c_str());
     if(inphyd.fail())
     {
         cout << "Hydrogen IC file opening failed" << endl ;
@@ -173,7 +178,7 @@ vector<vector<double>> InOut::getICHydrogen(string path_exec, string file_name)
       hyd_inp.push_back(hyd) ;
     }
     
-    vector<vector<double>> hydrogenIC(0) ;
+    vector<vector<double> > hydrogenIC(0) ;
     hydrogenIC.push_back(pos_hyd);
     hydrogenIC.push_back(hyd_inp);
     
@@ -186,7 +191,8 @@ vector<vector<double>> InOut::getICHydrogen(string path_exec, string file_name)
 void InOut::writeSettingsInCheck(double * settings, string path_exec)
 {
   ofstream chkinp ;
-  chkinp.open(path_exec + "input_check.txt", ios::out);
+  string name = path_exec + "input_check.txt";
+  chkinp.open(name.c_str(), ios::out);
 
 
   // nbNodes
@@ -217,7 +223,8 @@ void InOut::writeSettingsInCheck(double * settings, string path_exec)
 void InOut::writePhysicsInCheck(double * physicalParameters, string path_exec)
 {
   ofstream chkinp ;
-  chkinp.open(path_exec + "input_check.txt", std::ios_base::app);
+  string name = path_exec + "input_check.txt";
+  chkinp.open(name.c_str(), std::ios_base::app);
 
   chkinp << "Kd0:\t"  << physicalParameters[0]  << "\ts-1\n" ;
   chkinp << "Ediss:\t"<< physicalParameters[1]  << "\teV/at\n" ;
@@ -245,7 +252,8 @@ void InOut::writePhysicsInCheck(double * physicalParameters, string path_exec)
 void InOut::writeOuput(HNGD hngd, string path_exec, string output_name, int nbNodes, int nbOutput, double t, double temp, int nbPosPrint, int* listPosPrint)
 {
     ofstream output ;
-    output.open(path_exec + output_name, std::ios_base::app);
+    string name = path_exec + output_name;
+    output.open(name.c_str(), std::ios_base::app);
 
     /*custom*/
     std::vector<double> listVector[nbOutput];
@@ -274,7 +282,8 @@ void InOut::writeOuput(HNGD hngd, string path_exec, string output_name, int nbNo
 void InOut :: writeInitialOutput(HNGD hngd, string path_exec, string output_name, int nbNodes, int nbOutput, int nbPosPrint, int* listPosPrint)
 {
   ofstream output ;
-  output.open(path_exec + output_name, std::ios_base::app);
+  string name = path_exec + output_name;
+  output.open(name.c_str(), std::ios_base::app);
 
   if(nbNodes>0)
   {

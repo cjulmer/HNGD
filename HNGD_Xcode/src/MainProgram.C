@@ -1,23 +1,20 @@
 /**
   This code is the implementation of the Hydride Nucleation-Growth-Dissolution (HNGD) model.
   It was developped by Florian Passelaigue, based on Evrard Lacroix's PhD work.
- 
+
   The model development is described in
   E. Lacroix, P.-C. A. Simon, A. T. Motta, and J. Almer, Zirconium hydride precipitation and
   dissolution kinetics in the hysteresis region in zirconium alloys, ASTM (submitted), 2019.
- 
+
   The implementation. verification and validation of this code is described in chapter 2 of
   F. Passelaigue, "Hydride Nucleation-Growth-Dissolution model: implementation in BISON",
   Master of Science thesis, The Pennsylvania State University, 2020
   available on Penn State library:
   https://etda.libraries.psu.edu/catalog/17572fpp8
- 
+
   NB: the file structure was changed and new classes were created since the MS thesis was written.
     Refer to the README file for more details
  */
-
-// It Worked...
-// Commit
 
 #include <vector>
 #include <cmath>
@@ -39,67 +36,68 @@ int main(int argc, char* argv[])
   // Interpolation function for temperature history
   // This function returns the temperature profile as a vector, based on the current time t
   // and the temperature steps specified in the temperature input file.
-  vector<double> interpolate(double t, vector<double> time_stamps, vector<vector<double>> temp_stamps);
-  
-  
+  vector<double> interpolate(double t, vector<double> time_stamps, vector<vector<double> > temp_stamps);
+
+
   // The following function and variables are used to
   // determine if the current state should be written in the output
-  
+
   // This function checks if a time stamp specified in the temperature input file was passed.
   bool changeInterval(double t, double dt, vector<double> time_stamps);
-  
+
   // The EvalEvolution objects determine if a given quantity
   // changed sufficiently to justify a print in the output
   EvalEvolution evalEvolTemp ; // for temperature
   EvalEvolution evalEvolHyd ;  // for hydrogen
 
-  
+
   //----------------------- DEFINE EXECUTION FOLDER AND INPUT FILES NAMES --------------------
-  
+
   // Path to the folder to use /*custom*/
-  string path_exec = "/Users/fpp8/OneDrive - The Pennsylvania State University/Hydride_Modeling/Further HNGD/HNGD_Xcode/HNGD_Xcode/" ;
-  
+  string path_exec = "C:\\Users\\mayjo\\Desktop\\HNGD2\\input_files\\";
+
   // Default file names.
-  // These files will be used if no argument is given to the programm when launched.
+  // These files will be used if no argument is given to the program when launched.
   // These files must be in the folder defined by the path_exec variable
-  string settings_name = "1_settings.txt" ;
-  string treatment_name= "2_temperature.txt" ;
-  string physics_name  = "3_physics.txt" ;
-  string hydroIC_name  = "4_hydrogen.txt" ;
-  string output_name   = "output" ;
-  
+  string settings_name = "A09a_set.txt" ;
+  string treatment_name= "A09a_temp.txt" ;
+  string physics_name  = "A09a_phys.txt" ;
+  string hydroIC_name  = "A09a_hyd.txt" ;
+  string output_name   = "output.csv" ;
+
   // Name of the folder containing the input files.
   // The input files specified by the argument given at
   // launch must be placed in this folder
-  string input_folder = "input_files/" ;
-  
+  string input_folder = "input_files\\" ;
+
   // Argument reading
   // The argument must be used as a prefix to all input files.
   if(argc > 1)
   {
     string name(argv[1]);
-    
+
+    name = "A09a";
+
     settings_name  = input_folder + name + "_set.txt" ;
     treatment_name = input_folder + name + "_temp.txt";
     physics_name   = input_folder + name + "_phys.txt";
     hydroIC_name   = input_folder + name + "_hyd.txt" ;
     output_name    = name + "_out.csv" ;
   }
-  
-  output.open(path_exec + output_name, ios::out);
+
+  string name = path_exec + output_name;
+  output.open(name.c_str(), ios::out);
   if (output.fail())
   {
     cout  << "File opening error!\nProgram stopped.\n";
     exit(1);
   }
 
-  
-  
   //-------------------- INPUT READING ------------------------
   // More details on the format and information contained in each file in the README file
 
   // Simulation settings contained in the *_set.txt file
-  short int nbSettings = 6 ;
+  short int nbSettings = 7 ;
   double settings[nbSettings];
   InOut::getSettings(nbSettings, settings, path_exec, settings_name);
 
@@ -111,28 +109,34 @@ int main(int argc, char* argv[])
   // Thermal treatment contained in the *_temp.txt file
   vector<double>         time_temp(0), // input time stamps for temperature (s)
                          pos_temp(0);  // input positions for temperature (cm)
-  vector<vector<double>> temp_inp;     // input temperature values (K)
-  
-  vector<vector<double>> thermal_treatment = InOut::getThermalTreatment(path_exec, treatment_name);
+  vector<vector<double> > temp_inp;     // input temperature values (K)
+
+  vector<vector<double> > thermal_treatment = InOut::getThermalTreatment(path_exec, treatment_name);
   pos_temp = thermal_treatment[0] ;
   time_temp= thermal_treatment[1] ;
   for(int k=0; k<thermal_treatment.size()-2; k++)
     temp_inp.push_back(thermal_treatment[k+2]) ;
-  
+
+  if (settings[6] > 0)
+	  cout << "Calculating with Polar Geometry" << endl;
+  else
+	  cout << "Calculating with Linear Geometry" << endl;
+
+
   double t_end = time_temp[time_temp.size()-1];
 
   // Initial H profile contained in the *_hyd.txt file
-  vector<vector<double>> hydrogenIC = InOut::getICHydrogen(path_exec, hydroIC_name);
+  vector<vector<double> > hydrogenIC = InOut::getICHydrogen(path_exec, hydroIC_name);
   vector<double> pos_hyd = hydrogenIC[0] ;
   vector<double> hyd_inp = hydrogenIC[1] ;
-  
+
 
   //---------------- SYSTEM INITIALIZATION ---------------------
 
   // The HNGD object collects the input information to build
   // a Sample and the objects associated with each phenomenon
   HNGD hngd(settings, physicalParameters) ;
-  
+
   // Some of the settings are needed for the time loop
   int nbNodes        = settings[0];
   int nbPosPrint     = settings[0];
@@ -143,11 +147,11 @@ int main(int argc, char* argv[])
   double t = 0. ;
   vector<double> temp = interpolate(t, time_temp, temp_inp);
   hngd.getInitialConditions(pos_hyd, hyd_inp, pos_temp, temp);
-  
+
   // Associate the EvalEvolution objects to the profiles
   evalEvolHyd.setProfile(hngd.returnSample()->returnTotalContent()) ;
   evalEvolHyd.setCriterion(critPrint) ;
-  
+
   evalEvolTemp.setProfile(hngd.returnSample()->returnTemperature()) ;
   evalEvolTemp.setCriterion(critPrint) ;
 
@@ -156,12 +160,12 @@ int main(int argc, char* argv[])
   int listPosPrint[nbPosPrint] ;
   InOut::writeInitialOutput(hngd, path_exec, output_name, nbNodes, nbOutput, nbPosPrint, listPosPrint);
   InOut::writeOuput(hngd, path_exec, output_name, nbNodes, nbOutput, t, 0., nbPosPrint, listPosPrint);
-  
 
-  
+
+
   //-------------------- TIME LOOP --------------------------
   double printCountdown(0.);
-  
+
   do
   {
   // Interpolation of input temperature using the function "interpolate" implemented below
@@ -189,26 +193,26 @@ int main(int argc, char* argv[])
   if(printCountdown>0.) // To be sure that the final state is printed
     InOut::writeOuput(hngd, path_exec, output_name, nbNodes, nbOutput, t, 0., nbPosPrint, listPosPrint);
     cout << ' ' ;
-  
+
 
   // ------------------- END OF COMPUTATION -----------------------
 
   cout  << "The calculation was performed!\n";
 
   // Sound notification at the end of simulation /*custom*/
-  system("open \"/Users/fpp8/OneDrive - The Pennsylvania State University/Hydride_Modeling/Further HNGD/HNGD_Xcode/HNGD_Xcode/zelda.mp3\" -a VLC");
-  
+ // system("open \"C:\\Users\\mayjo\\Documents\\GitHub\\HNGD\\HNGD_Xcode\\zelda.mp3\" -a VLC");
+
   return 0;
 }
 
 
-vector<double> interpolate(double t, vector<double> time_stamps, vector<vector<double>> temp_stamps)
+vector<double> interpolate(double t, vector<double> time_stamps, vector<vector<double> > temp_stamps)
 {
-  
+
   // If end of simulation, no interpolation
   if(t >= time_stamps[time_stamps.size()-1])
     return temp_stamps[temp_stamps.size()-1] ;
-  
+
   else
   {
     int k=0 ;
@@ -216,7 +220,7 @@ vector<double> interpolate(double t, vector<double> time_stamps, vector<vector<d
       k ++ ;
 
     vector<double> interpolated_temp_stamps(temp_stamps[0].size()) ;
-    
+
     for(int i=0; i<temp_stamps[0].size(); i++)
       interpolated_temp_stamps[i] = temp_stamps[k-1][i] + (temp_stamps[k][i] - temp_stamps[k-1][i]) * (t - time_stamps[k-1]) / (time_stamps[k] - time_stamps[k-1]) ;
 
@@ -229,10 +233,10 @@ bool changeInterval(double t, double dt, vector<double> time_stamps)
   // If end of simulation, no interpolation
   if(t >= time_stamps[time_stamps.size()-1] || t+dt >= time_stamps[time_stamps.size()-1])
     return true ;
-  
+
   int k=0 ;
   while(t >= time_stamps[k])
     k ++ ;
-  
+
   return t+dt > time_stamps[k] ;
 }

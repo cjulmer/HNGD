@@ -25,8 +25,10 @@ HNGD :: HNGD(double* settings, double* physicalParameters):
 
     _diffusion(new Diffusion(_sample,
                 physicalParameters[14],     // D0
-                physicalParameters[1],     // Ed
-                physicalParameters[15])),   // Q
+                physicalParameters[1],      // Ed
+                physicalParameters[15],     // Q
+				settings[6],				// Geometry Type
+    			settings[2])),				// Radius or Sample Length
 
     _Css     (& (_sample->returnSolutionContent())),// Solid solution profile
     _Ctot    (& (_sample->returnTotalContent())),   // Hydrogen profile
@@ -107,7 +109,9 @@ void HNGD :: compute()
     
     //                ---- COMPUTE THE NEW SOLID SOLUTION PROFILE ----
     
-    // Compute hydrogen flux
+    // Compute Gradient & hydrogen flux
+
+    _diffusion->computeGradient() ;
     _diffusion->computeFlux() ;
     
     // Compute new hydrogen distribution
@@ -153,7 +157,7 @@ void HNGD :: compute()
     }
 
     // Safeguard against negative concentration
-    if(*min_element(new_c_ss.begin(), new_c_ss.end())<0 || *min_element(new_c_prec.begin(), new_c_prec.end())<0)
+    if(*min(new_c_ss.begin(), new_c_ss.end())<0 || *min(new_c_prec.begin(), new_c_prec.end())<0)
         std::cout << "/!\\ Negative Concentration /!\\ " << std::endl ;
     
     // Update the hydrogen profiles

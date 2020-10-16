@@ -19,11 +19,11 @@ class InOut
     // Read the physical parameters file
         static void getPhysics(int nb, double* physics, string path_exec, string file_name);
     
-    // Read the teamperature history
-        static vector<vector<double>> getThermalTreatment(string path_exec, string file_name);
+    // Read the temperature history
+        static vector<vector<double> > getThermalTreatment(string path_exec, string file_name);
     
     // Read the initial hydrogen profile
-        static vector<vector<double>> getICHydrogen(string path_exec, string file_name);
+        static vector<vector<double> > getICHydrogen(string path_exec, string file_name);
     
     // Write the input information in a file for verification purpose
         static void writeSettingsInCheck(double * settings, string path_exec);

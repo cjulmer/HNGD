@@ -72,3 +72,13 @@ void Sample :: spatialeInterpolation(vector<double>& refX, vector<double>& refY,
         vectorY[i] = refY[k-1] + (refY[k] - refY[k-1]) * (_position[i] - refX[k-1]) / (refX[k] - refX[k-1]);
     }
 }
+
+void Sample :: polarInterpolation(vector<double>& refX, vector<double>& refY, vector<double>& vectorY)
+{
+	int k = 1;
+	for(int i=0; i<_position.size(); i++) {
+		if(_position[i] > refX[k])
+			k++ ;
+		vectorY[i] = refY[k-1] + (refY[k] - refY[k-1]) * (_position[i] - refX[k-1]) / (refX[k] - refX[k-1]);
+	}
+}

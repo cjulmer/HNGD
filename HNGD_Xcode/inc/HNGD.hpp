@@ -1,7 +1,7 @@
 /**
     This class implements the HNGD model. It uses secondary classes
     for each phenomenon: hydrogen Diffusion, hydride Nucleation, Growth and Dissolution.
-    An additionnal class Sample is used to create the geometry, manage the temperature
+    An additional class Sample is used to create the geometry, manage the temperature
     profile and compute the solubility/supersolubility profiles.
  */
 
