@@ -13,7 +13,7 @@
 class Diffusion
 {
 public:
-    Diffusion(Sample * sample, double D0, double Ed, double Q, double Geometry, double R) ;
+    Diffusion(Sample * sample, double D0, double Ed, double Q, double geometry, double radius) ;
     
     // Compute the diffusion coefficient at each position
     void computeCoeff() ;
@@ -29,12 +29,15 @@ public:
     
     vector<double>& returnFlux() ;
     
+    vector<double>& returnCGrad    () {return dC_dx;}
+    vector<double>& returnTGrad    () {return dT_dx;}
+
 private:
     const int _nbCells ;    	// Number of nodes
     const double _D0 ;     		// Preexponential factor for diffusion coefficient
     const double _Ed ;      	// Activation energy for diffusion coefficient
     const double _Q ;       	// Heat of transport
-    const double _Geometry ;	// Polar or Linear
+    const double _geometry ;	// Polar or Linear
     const double _radius ;		// Radius of sample
     
     vector<double> _coeff_Fick ; // Coefficient of diffusion

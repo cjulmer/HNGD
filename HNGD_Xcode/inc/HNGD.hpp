@@ -18,11 +18,11 @@
 class HNGD
 {
     public:
-        HNGD(double* settings, double* physicalParameters);
+        HNGD(double* settings, double* physicalParameters, double xEnd, int geometry);
         
     // Use the information taken from the input files to create the initial state
         void getInitialConditions(vector<double> pos_hyd, vector<double> hyd_inp,
-                                  vector<double> pos_temp,vector<double> temp_inp);
+                                  vector<double> pos_temp,vector<double> temp_inp, double geometry);
     
     // Get the current temperature from the main program
         void getInput(vector<double> pos_temp, vector<double> temp_inp);

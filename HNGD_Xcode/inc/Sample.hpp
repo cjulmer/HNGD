@@ -25,7 +25,7 @@ public:
     void computeEquilibrium();
     
     // Create the geometry
-    void computeLocations(double x0, double xEnd);
+    void computeLocations(double x0, double xEnd, int _geometry);
     
     // Interpolate the input profile [refX; refY] on each point of the geometry
     void spatialeInterpolation(vector<double>& refX, vector<double>& refY, vector<double>& vectorY);
@@ -40,7 +40,7 @@ public:
     vector<double>& returnTotalContent    () {return _totalContent;}
     vector<double>& returnTSSp            () {return _tssp;}
     vector<double>& returnTSSd            () {return _tssd;}
-    
+
     // Setters
     void setTemperature     (vector<double> temperature){_temperature     = vector<double>(temperature) ;}
     void setSolutionContent (vector<double> c_ss)       {_solutionContent = vector<double>(c_ss)        ;}
@@ -65,6 +65,10 @@ private:
     vector<double> _tssp ;  // Supersolubility profile
     vector<double> _tssd ;  // Solubility profile
     
+    //
+    vector<double> _dC_dx;
+    vector<double> _dT_dx;
+
 };
 
 

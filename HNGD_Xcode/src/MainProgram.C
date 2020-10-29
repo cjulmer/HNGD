@@ -135,7 +135,9 @@ int main(int argc, char* argv[])
 
   // The HNGD object collects the input information to build
   // a Sample and the objects associated with each phenomenon
-  HNGD hngd(settings, physicalParameters) ;
+  int n = pos_temp.size() - 1;
+  double xEnd = pos_temp[n];
+  HNGD hngd(settings, physicalParameters, xEnd, settings[6]) ;
 
   // Some of the settings are needed for the time loop
   int nbNodes        = settings[0];
@@ -146,7 +148,7 @@ int main(int argc, char* argv[])
   // Initialize the temperature and hydrogen profiles
   double t = 0. ;
   vector<double> temp = interpolate(t, time_temp, temp_inp);
-  hngd.getInitialConditions(pos_hyd, hyd_inp, pos_temp, temp);
+  hngd.getInitialConditions(pos_hyd, hyd_inp, pos_temp, temp, settings[6]);
 
   // Associate the EvalEvolution objects to the profiles
   evalEvolHyd.setProfile(hngd.returnSample()->returnTotalContent()) ;

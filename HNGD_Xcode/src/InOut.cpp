@@ -257,9 +257,9 @@ void InOut::writeOuput(HNGD hngd, string path_exec, string output_name, int nbNo
 
     /*custom*/
     std::vector<double> listVector[nbOutput];
-    listVector[0] = hngd.returnSample()->returnTotalContent();
-    listVector[1] = hngd.returnSample()->returnSolutionContent();
-    listVector[2] = hngd.returnSample()->returnHydrideContent();
+    listVector[0] = hngd.returnSample()->returnTemperature();
+    listVector[1] = hngd.returnDiff()->returnTGrad();
+    listVector[2] = hngd.returnDiff()->returnFlux();
     listVector[3] = hngd.returnSample()->returnTSSd();
     listVector[4] = hngd.returnSample()->returnTSSp();
 

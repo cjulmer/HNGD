@@ -1,7 +1,7 @@
 #include "HNGD.hpp"
 #include <iostream>
 
-HNGD :: HNGD(double* settings, double* physicalParameters):
+HNGD :: HNGD(double* settings, double* physicalParameters, double xEnd, int geometry):
 
     _sample(new Sample((int)settings[0],    // number of cells
                 settings[1],                // bias
@@ -52,7 +52,7 @@ HNGD :: HNGD(double* settings, double* physicalParameters):
                     physicalParameters[6]); // Eth3
     
     // Create geometry
-    _sample->computeLocations(0., settings[2]) ;
+    _sample->computeLocations(0., xEnd, geometry) ;
                         //   (0., sample length)
     
     // Time step management
@@ -68,22 +68,40 @@ HNGD :: HNGD(double* settings, double* physicalParameters):
 
 
 void HNGD :: getInitialConditions(vector<double> pos_hyd, vector<double> hyd_inp,
-                                  vector<double> pos_temp,vector<double> temp_inp)
+                                  vector<double> pos_temp,vector<double> temp_inp, double geometry)
 {
     
     // Create initial hydrogen profile
-    _sample->spatialeInterpolation(pos_hyd, hyd_inp, _sample->returnTotalContent()) ;
-    _sample->spatialeInterpolation(pos_hyd, hyd_inp, _sample->returnSolutionContent()) ;
+	if (geometry > 0){ // Polar
+    _sample->polarInterpolation(pos_hyd, hyd_inp, _sample->returnTotalContent()) ;
+    _sample->polarInterpolation(pos_hyd, hyd_inp, _sample->returnSolutionContent()) ;
     _sample->setHydrideContent(vector<double>(_NbCells,0.));
     
     // Create initial temperature profile
-    _sample->spatialeInterpolation(pos_temp, temp_inp, _sample->returnTemperature()) ;
+    _sample->polarInterpolation(pos_temp, temp_inp, _sample->returnTemperature()) ;
     
     // Compute solubilities
     _sample->computeTSS() ;
     
     // Compute the initial equilibrium
     _sample->computeEquilibrium();
+	}
+
+	else { // Linear
+	_sample->spatialeInterpolation(pos_hyd, hyd_inp, _sample->returnTotalContent()) ;
+	_sample->spatialeInterpolation(pos_hyd, hyd_inp, _sample->returnSolutionContent()) ;
+	_sample->setHydrideContent(vector<double>(_NbCells,0.));
+
+	// Create initial temperature profile
+	_sample->spatialeInterpolation(pos_temp, temp_inp, _sample->returnTemperature()) ;
+
+	// Compute solubilities
+	_sample->computeTSS() ;
+
+	// Compute the initial equilibrium
+	_sample->computeEquilibrium();
+	}
+
 }
 
 
@@ -171,7 +189,7 @@ void HNGD :: compute()
 void HNGD :: getInput(vector<double> pos_temp, vector<double> temp_inp)
 {
     // Update the state of the sample to compute the next state
-    _sample->spatialeInterpolation(pos_temp, temp_inp, _sample->returnTemperature());
+    _sample->polarInterpolation(pos_temp, temp_inp, _sample->returnTemperature());
 }
 
 

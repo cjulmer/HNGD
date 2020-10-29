@@ -45,21 +45,33 @@ void Sample :: computeTSS()
 }
 
 // Domain definition
-void Sample :: computeLocations(double x0, double xEnd)
+void Sample :: computeLocations(double x0, double xEnd, int _geometry)
 {
-    double  sum = 1. + _bias ;
-    for(int k=0; k<_nbCells-3; k++)
-        sum = 1. + _bias*sum ;
+	if (_geometry > 0){ // Polar, want to not create an Xend point since 2pi = 0 radians
+		double xEnd = 2*M_PI;
+	    const double initialLenght = 2*M_PI/_nbCells;
 
-    const double initialLenght = (xEnd - x0)/sum ;
+	    _position[0] = x0 ;
+	    for (int k=1; k<_nbCells; k++)
+	    	_position[k] = _position[k-1] + initialLenght;
 
-    _position[0] = x0 ;
-    _position[1] = x0 + initialLenght ;
-    
-    for(int k=2; k<_nbCells-1; k++)
-        _position[k] = _position[k-1] + _bias*(_position[k-1] - _position[k-2]) ;
-    
-    _position[_nbCells-1] = xEnd  ;
+	    _position[_nbCells] = xEnd - initialLenght;
+    }
+
+	else { // Linear
+	    double  sum = 1. + _bias ;
+	    for(int k=0; k<_nbCells-3; k++)
+	        sum = 1. + _bias*sum ;
+
+	    const double initialLenght = (xEnd - x0)/sum ;
+
+	    _position[0] = x0 ;
+	    _position[1] = x0 + initialLenght ;
+
+	    for(int k=2; k<_nbCells-1; k++)
+	        _position[k] = _position[k-1] + _bias*(_position[k-1] - _position[k-2]) ;
+
+	    _position[_nbCells-1] = xEnd  ;}
 }
 
 // Interpolation
@@ -75,10 +87,15 @@ void Sample :: spatialeInterpolation(vector<double>& refX, vector<double>& refY,
 
 void Sample :: polarInterpolation(vector<double>& refX, vector<double>& refY, vector<double>& vectorY)
 {
+	vector <double> localposition;
+	localposition = _position;
 	int k = 1;
-	for(int i=0; i<_position.size(); i++) {
-		if(_position[i] > refX[k])
+	double initialLenght = 2*M_PI / localposition.size() ;
+	localposition.push_back(localposition[localposition.size()]+initialLenght);
+
+	for(int i=0; i<localposition.size(); i++) {
+		if(localposition[i] > refX[k])
 			k++ ;
-		vectorY[i] = refY[k-1] + (refY[k] - refY[k-1]) * (_position[i] - refX[k-1]) / (refX[k] - refX[k-1]);
+		vectorY[i] = refY[k-1] + (refY[k] - refY[k-1]) * (localposition[i] - refX[k-1]) / (refX[k] - refX[k-1]);
 	}
 }
