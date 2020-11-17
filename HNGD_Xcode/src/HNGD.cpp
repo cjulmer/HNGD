@@ -43,7 +43,9 @@ HNGD :: HNGD(double* settings, double* physicalParameters, double xEnd, int geom
     _rateGro (& (_growth->returnRate())),           // Growth rate at each position
     _rateDis (& (_dissolution->returnRate()))       // Dissolution rate at each position
 {
-    _NbCells = (int)settings[0] ; // Number of nodes
+    _NbCells = (int)settings[0] ;	// Number of nodes
+    _geometry = (int)settings[6] ;	// Geometry Type
+    _radius = (int)settings[2];		// Radius or Sample Length
     
     Precipitation :: defineEnergyPolynomial(
                     physicalParameters[3],  // Eth0
@@ -68,26 +70,9 @@ HNGD :: HNGD(double* settings, double* physicalParameters, double xEnd, int geom
 
 
 void HNGD :: getInitialConditions(vector<double> pos_hyd, vector<double> hyd_inp,
-                                  vector<double> pos_temp,vector<double> temp_inp, double geometry)
+                                  vector<double> pos_temp,vector<double> temp_inp)
 {
-    
     // Create initial hydrogen profile
-	if (geometry > 0){ // Polar
-    _sample->polarInterpolation(pos_hyd, hyd_inp, _sample->returnTotalContent()) ;
-    _sample->polarInterpolation(pos_hyd, hyd_inp, _sample->returnSolutionContent()) ;
-    _sample->setHydrideContent(vector<double>(_NbCells,0.));
-    
-    // Create initial temperature profile
-    _sample->polarInterpolation(pos_temp, temp_inp, _sample->returnTemperature()) ;
-    
-    // Compute solubilities
-    _sample->computeTSS() ;
-    
-    // Compute the initial equilibrium
-    _sample->computeEquilibrium();
-	}
-
-	else { // Linear
 	_sample->spatialeInterpolation(pos_hyd, hyd_inp, _sample->returnTotalContent()) ;
 	_sample->spatialeInterpolation(pos_hyd, hyd_inp, _sample->returnSolutionContent()) ;
 	_sample->setHydrideContent(vector<double>(_NbCells,0.));
@@ -100,7 +85,6 @@ void HNGD :: getInitialConditions(vector<double> pos_hyd, vector<double> hyd_inp
 
 	// Compute the initial equilibrium
 	_sample->computeEquilibrium();
-	}
 
 }
 
@@ -134,9 +118,17 @@ void HNGD :: compute()
     
     // Compute new hydrogen distribution
     vector<double> new_c_ss(_NbCells) ;
-    new_c_ss[0] = (*_Css)[0] - _dt * ((*_flux)[0]) / ((*_position)[1] - (*_position)[0]);
-    for(int k=1; k<_NbCells; k++)
-        new_c_ss[k] = (*_Css)[k] - _dt * ((*_flux)[k] - (*_flux)[k-1]) / ((*_position)[k] - (*_position)[k-1]) ;
+
+    if (_geometry>0) { // Polar
+    	new_c_ss[0] = (*_Css)[0] - _dt * ((*_flux)[0] - (*_flux)[_NbCells-1]) / (_radius*((*_position)[0] - (*_position)[_NbCells-1]));
+    	for (int k=1; k<_NbCells; k++)
+    		new_c_ss[k] = (*_Css)[k] - _dt * ((*_flux)[k] - (*_flux)[k-1]) / (_radius*((*_position)[k] - (*_position)[k-1])) ;
+
+    } else { // Linear
+		new_c_ss[0] = (*_Css)[0] - _dt * ((*_flux)[0]) / ((*_position)[1] - (*_position)[0]);
+		for(int k=1; k<_NbCells; k++)
+			new_c_ss[k] = (*_Css)[k] - _dt * ((*_flux)[k] - (*_flux)[k-1]) / ((*_position)[k] - (*_position)[k-1]) ;
+	}
     
     _sample->setSolutionContent(new_c_ss) ;
     _sample->updateTotalContent() ;
@@ -153,7 +145,7 @@ void HNGD :: compute()
     _growth->computeRate() ;
     _dissolution->computeRate() ;
     
-    // Precipitation/dissolution algorithme to compute the total rate at each position
+    // Precipitation/dissolution algorithm to compute the total rate at each position
     vector<double> rate(_NbCells, 0.);
     for(int k=0; k<_NbCells; k++)
     {

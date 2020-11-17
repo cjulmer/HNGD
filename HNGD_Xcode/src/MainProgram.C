@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
   // Initialize the temperature and hydrogen profiles
   double t = 0. ;
   vector<double> temp = interpolate(t, time_temp, temp_inp);
-  hngd.getInitialConditions(pos_hyd, hyd_inp, pos_temp, temp, settings[6]);
+  hngd.getInitialConditions(pos_hyd, hyd_inp, pos_temp, temp);
 
   // Associate the EvalEvolution objects to the profiles
   evalEvolHyd.setProfile(hngd.returnSample()->returnTotalContent()) ;

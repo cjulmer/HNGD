@@ -22,7 +22,7 @@ class HNGD
         
     // Use the information taken from the input files to create the initial state
         void getInitialConditions(vector<double> pos_hyd, vector<double> hyd_inp,
-                                  vector<double> pos_temp,vector<double> temp_inp, double geometry);
+                                  vector<double> pos_temp,vector<double> temp_inp);
     
     // Get the current temperature from the main program
         void getInput(vector<double> pos_temp, vector<double> temp_inp);
@@ -50,6 +50,8 @@ class HNGD
         Dissolution* _dissolution ;
     
         int _NbCells ;  // number of nodes in the geometry
+        int _geometry ;	// Geometry type
+        int _radius ;	// Radius or Sample Length
         bool _auto_dt ; // time step fixed by user or computed at each step
         double _dt ;    // time step value
 

@@ -1,4 +1,4 @@
-/**
+//**
     This class creates the geometry, manages the temperature profile,
     and compute the solubility/supersolubility profiles for the HNGD model.
  */

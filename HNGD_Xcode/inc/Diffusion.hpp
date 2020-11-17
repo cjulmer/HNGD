@@ -29,8 +29,8 @@ public:
     
     vector<double>& returnFlux() ;
     
-    vector<double>& returnCGrad    () {return dC_dx;}
-    vector<double>& returnTGrad    () {return dT_dx;}
+    vector<double>& returnCGrad    () {return _dC_dx;}
+    vector<double>& returnTGrad    () {return _dT_dx;}
 
 private:
     const int _nbCells ;    	// Number of nodes
@@ -48,8 +48,8 @@ private:
     const vector<double> * _Css ;        // Solid solution profile
     const vector<double> * _Cprec ;      // Hydride profile
 
-	vector<double> dC_dx ;
-	vector<double> dT_dx ;
+	vector<double> _dC_dx ;
+	vector<double> _dT_dx ;
 };
 
 #endif /* Diffusion_hpp */
