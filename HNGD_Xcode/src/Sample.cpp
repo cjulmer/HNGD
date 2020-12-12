@@ -55,7 +55,7 @@ void Sample :: computeLocations(double x0, double xEnd, int _geometry)
 	    for (int k=1; k<_nbCells; k++)
 	    	_position[k] = _position[k-1] + initialLenght;
 
-	    _position[_nbCells] = xEnd - initialLenght;
+	    // _position[_nbCells] = xEnd - initialLenght;
     }
 
 	else { // Linear
@@ -85,17 +85,3 @@ void Sample :: spatialeInterpolation(vector<double>& refX, vector<double>& refY,
     }
 }
 
-void Sample :: polarInterpolation(vector<double>& refX, vector<double>& refY, vector<double>& vectorY)
-{
-	vector <double> localposition;
-	localposition = _position;
-	int k = 1;
-	double initialLenght = 2*M_PI / localposition.size() ;
-	localposition.push_back(localposition[localposition.size()]+initialLenght);
-
-	for(int i=0; i<localposition.size(); i++) {
-		if(localposition[i] > refX[k])
-			k++ ;
-		vectorY[i] = refY[k-1] + (refY[k] - refY[k-1]) * (localposition[i] - refX[k-1]) / (refX[k] - refX[k-1]);
-	}
-}

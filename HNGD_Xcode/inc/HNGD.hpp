@@ -40,7 +40,11 @@ class HNGD
         Growth *     returnGro      () {return _growth      ;} ;
         Dissolution* returnDiss     () {return _dissolution ;} ;
         
+
+
         double returnTimeStep() {return _dt;};
+
+
         
     private:
         Sample*      _sample      ; // Geometry, temperature and solubility management
@@ -51,7 +55,7 @@ class HNGD
     
         int _NbCells ;  // number of nodes in the geometry
         int _geometry ;	// Geometry type
-        int _radius ;	// Radius or Sample Length
+        double _radius ;	// Radius or Sample Length
         bool _auto_dt ; // time step fixed by user or computed at each step
         double _dt ;    // time step value
 
@@ -67,6 +71,7 @@ class HNGD
         const vector<double> * _rateNuc ;   // Rate of nucleation at each position
         const vector<double> * _rateGro ;   // Rate of growth at each position
         const vector<double> * _rateDis ;   // Rate of dissolution at each position
+
     
 };
 

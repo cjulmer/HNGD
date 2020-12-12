@@ -29,43 +29,60 @@ void Diffusion :: computeCoeff()
 
 void Diffusion :: computeGradient()
 {	// Find Temp and Solid Solution gradients at each node, depending on geometry type
-	if (_geometry > 0) { // Polar Geometry
-		for (int k=0; k<_nbCells; k++)
-		{ // Grad = 1/r * d/dtheta = 1/r * (Value[k+1] - Value[k])/(_positions[k+1] - _positions[k])
-			_dC_dx[k] = 1/_radius * ((*_Css)[k+1] - (*_Css)[k]) / ((*_positions)[k+1] - (*_positions)[k]);
-			_dT_dx[k] = 1/_radius * ((*_temperature)[k+1] - (*_temperature)[k]) / ((*_positions)[k+1] - (*_positions)[k]);
-		}
-		// Last node's gradient function of that nodes Css and first node's Css
-		_dC_dx[_nbCells-1] = 1/_radius * ((*_Css)[0] - (*_Css)[_nbCells-1]) / (2*M_PI - (*_positions)[_nbCells-1]);
-		_dT_dx[_nbCells-1] = 1/_radius * ((*_temperature)[0] - (*_temperature)[_nbCells-1]) / (2*M_PI - (*_positions)[_nbCells-1]);
+	if (_geometry > 0)
+		{ // Polar Geometry
+			for (int k=0; k<_nbCells-1; k++)
+				{ // Grad = 1/r * d/dtheta = 1/r * (Value[k+1] - Value[k])/(_positions[k+1] - _positions[k])
+					_dC_dx[k] = 1/_radius * ((*_Css)[k+1] - (*_Css)[k]) / ((*_positions)[k+1] - (*_positions)[k]);
+					_dT_dx[k] = 1/_radius * ((*_temperature)[k+1] - (*_temperature)[k]) / ((*_positions)[k+1] - (*_positions)[k]);
+				}
+			// Last node's gradient function of that nodes Css and first node's Css
+			_dC_dx[_nbCells-1] = 1/_radius * ((*_Css)[0] - (*_Css)[_nbCells-1]) / (2*M_PI - (*_positions)[_nbCells-1]);
+			_dT_dx[_nbCells-1] = 1/_radius * ((*_temperature)[0] - (*_temperature)[_nbCells-1]) / (2*M_PI - (*_positions)[_nbCells-1]);
 
-	}else {for (int k=0; k<_nbCells-1; k++)
-		{ // Linear Geometry
-			_dC_dx[k] = ((*_Css)[k+1] - (*_Css)[k]) / ((*_positions)[k+1] - (*_positions)[k]) ;
-			_dT_dx[k] = ((*_temperature)[k+1] - (*_temperature)[k]) / ((*_positions)[k+1] - (*_positions)[k]) ;
 		}
-	}
+	else
+		{ // Linear Geometry
+		for (int k=0; k<_nbCells-1; k++)
+			{
+				_dC_dx[k] = ((*_Css)[k+1] - (*_Css)[k]) / ((*_positions)[k+1] - (*_positions)[k]) ;
+				_dT_dx[k] = ((*_temperature)[k+1] - (*_temperature)[k]) / ((*_positions)[k+1] - (*_positions)[k]) ;
+			}
+		}
 }
 
 void Diffusion :: computeFlux()
 {
     // Fick's law and Soret effect diffusion components
-    double flux_fick(0.), flux_soret(0.) ;
-    if (_geometry > 0) { // Polar Geometry
-        for(int k=0; k<_nbCells; k++)
-        {
-            flux_fick = - _coeff_Fick[k] * _dC_dx[k] ;
-            flux_soret = - _coeff_Fick[k] * _Q * (*_Css)[k] * _dT_dx[k] / (R * pow((*_temperature)[k], 2)) ;
-            _flux[k] = flux_fick + flux_soret ;
-        }
-    }else {
-    for(int k=0; k<_nbCells-1; k++)
-    {
-        flux_fick = - _coeff_Fick[k] * _dC_dx[k] ;
-        flux_soret = - _coeff_Fick[k] * _Q * (*_Css)[k] * _dT_dx[k] / (R * pow((*_temperature)[k], 2)) ;
-        _flux[k] = flux_fick + flux_soret ;
-    }
-    }
+    double flux_fick(0.), flux_soret(0.), _avgtemp(0.), _avgCss(0.) ;
+    if (_geometry > 0)
+    	{ // Polar Geometry
+			for(int k=0; k<_nbCells; k++)
+			{
+				if (k==_nbCells-1)
+					{
+					_avgtemp = ((*_temperature)[0]+(*_temperature)[_nbCells-1])/2 ;
+					_avgCss = ((*_Css)[0]+(*_Css)[_nbCells-1])/2 ;
+					}
+				else
+					{
+					_avgtemp = ((*_temperature)[k]+(*_temperature)[k+1])/2 ;
+					_avgCss = ((*_Css)[k]+(*_Css)[k+1])/2 ;
+					}
+				flux_fick = - _coeff_Fick[k] * _dC_dx[k] ;
+				flux_soret = - _coeff_Fick[k] * _Q * _avgCss * _dT_dx[k] / (R * pow(_avgtemp, 2)) ;
+				_flux[k] = flux_fick + flux_soret ;
+			}
+    	}
+    else
+    	{ // Linear Geometry
+		for(int k=0; k<_nbCells-1; k++)
+			{
+				flux_fick = - _coeff_Fick[k] * _dC_dx[k] ;
+				flux_soret = - _coeff_Fick[k] * _Q * (*_Css)[k] * _dT_dx[k] / (R * pow((*_temperature)[k], 2)) ;
+				_flux[k] = flux_fick + flux_soret ;
+			}
+		}
     
 }
 

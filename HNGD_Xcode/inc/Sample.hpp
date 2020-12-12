@@ -1,4 +1,4 @@
-//**
+/**
     This class creates the geometry, manages the temperature profile,
     and compute the solubility/supersolubility profiles for the HNGD model.
  */
@@ -29,7 +29,6 @@ public:
     
     // Interpolate the input profile [refX; refY] on each point of the geometry
     void spatialeInterpolation(vector<double>& refX, vector<double>& refY, vector<double>& vectorY);
-    void polarInterpolation(vector<double>& refX, vector<double>& refY, vector<double>& vectorY);
     
     // Getters
     const int returnNbCells() {return _nbCells;}

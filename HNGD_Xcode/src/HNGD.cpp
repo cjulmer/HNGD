@@ -45,7 +45,7 @@ HNGD :: HNGD(double* settings, double* physicalParameters, double xEnd, int geom
 {
     _NbCells = (int)settings[0] ;	// Number of nodes
     _geometry = (int)settings[6] ;	// Geometry Type
-    _radius = (int)settings[2];		// Radius or Sample Length
+    _radius = (double)settings[2];		// Radius or Sample Length
     
     Precipitation :: defineEnergyPolynomial(
                     physicalParameters[3],  // Eth0
@@ -118,22 +118,21 @@ void HNGD :: compute()
     
     // Compute new hydrogen distribution
     vector<double> new_c_ss(_NbCells) ;
-
-    if (_geometry>0) { // Polar
-    	new_c_ss[0] = (*_Css)[0] - _dt * ((*_flux)[0] - (*_flux)[_NbCells-1]) / (_radius*((*_position)[0] - (*_position)[_NbCells-1]));
+    if (_geometry>0)
+    	{ // Polar Geometry
+    	new_c_ss[0] = (*_Css)[0] - _dt * ((*_flux)[0] - (*_flux)[_NbCells-1]) / (_radius*(2*M_PI - (*_position)[_NbCells-1]));
     	for (int k=1; k<_NbCells; k++)
     		new_c_ss[k] = (*_Css)[k] - _dt * ((*_flux)[k] - (*_flux)[k-1]) / (_radius*((*_position)[k] - (*_position)[k-1])) ;
-
-    } else { // Linear
+    	}
+    else { // Linear Geometry
 		new_c_ss[0] = (*_Css)[0] - _dt * ((*_flux)[0]) / ((*_position)[1] - (*_position)[0]);
 		for(int k=1; k<_NbCells; k++)
 			new_c_ss[k] = (*_Css)[k] - _dt * ((*_flux)[k] - (*_flux)[k-1]) / ((*_position)[k] - (*_position)[k-1]) ;
-	}
+		}
     
     _sample->setSolutionContent(new_c_ss) ;
     _sample->updateTotalContent() ;
-    
-    
+
     
     
     //                    ---- NUCLEATION  GROWTH  DISSOLUTION ----
@@ -181,7 +180,7 @@ void HNGD :: compute()
 void HNGD :: getInput(vector<double> pos_temp, vector<double> temp_inp)
 {
     // Update the state of the sample to compute the next state
-    _sample->polarInterpolation(pos_temp, temp_inp, _sample->returnTemperature());
+    _sample->spatialeInterpolation(pos_temp, temp_inp, _sample->returnTemperature());
 }
 
 
