@@ -55,7 +55,7 @@ HNGD :: HNGD(double* settings, double* physicalParameters, double xEnd, int geom
     
     // Create geometry
     _sample->computeLocations(0., xEnd, geometry) ;
-                        //   (0., sample length)
+                        //   (0., sample length, geometry type)
     
     // Time step management
     if(settings[3] < 0.)
@@ -118,16 +118,19 @@ void HNGD :: compute()
     
     // Compute new hydrogen distribution
     vector<double> new_c_ss(_NbCells) ;
+
     if (_geometry>0)
     	{ // Polar Geometry
-    	new_c_ss[0] = (*_Css)[0] - _dt * ((*_flux)[0] - (*_flux)[_NbCells-1]) / (_radius*(2*M_PI - (*_position)[_NbCells-1]));
-    	for (int k=1; k<_NbCells; k++)
-    		new_c_ss[k] = (*_Css)[k] - _dt * ((*_flux)[k] - (*_flux)[k-1]) / (_radius*((*_position)[k] - (*_position)[k-1])) ;
+    		new_c_ss[0] = (*_Css)[0] - _dt * ((*_flux)[0] - (*_flux)[_NbCells-1]) / (_radius*(2*M_PI - (*_position)[_NbCells-1]));
+    		for (int k=1; k<_NbCells; k++)
+    			new_c_ss[k] = (*_Css)[k] - _dt * ((*_flux)[k] - (*_flux)[k-1]) / (_radius*((*_position)[k] - (*_position)[k-1])) ;
     	}
-    else { // Linear Geometry
-		new_c_ss[0] = (*_Css)[0] - _dt * ((*_flux)[0]) / ((*_position)[1] - (*_position)[0]);
-		for(int k=1; k<_NbCells; k++)
-			new_c_ss[k] = (*_Css)[k] - _dt * ((*_flux)[k] - (*_flux)[k-1]) / ((*_position)[k] - (*_position)[k-1]) ;
+
+    else
+    	{ // Linear Geometry
+			new_c_ss[0] = (*_Css)[0] - _dt * ((*_flux)[0]) / ((*_position)[1] - (*_position)[0]);
+			for(int k=1; k<_NbCells; k++)
+				new_c_ss[k] = (*_Css)[k] - _dt * ((*_flux)[k] - (*_flux)[k-1]) / ((*_position)[k] - (*_position)[k-1]) ;
 		}
     
     _sample->setSolutionContent(new_c_ss) ;
