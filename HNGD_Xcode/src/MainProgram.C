@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
   // Initialize the output file
   const short int nbOutput = 5 ; /*custom*/
   int listPosPrint[nbPosPrint] ;
-  InOut::writeInitialOutput(hngd, path_exec, output_name, nbNodes, nbOutput, nbPosPrint, listPosPrint);
+  InOut::writeInitialOutput(hngd, path_exec, output_name, nbNodes, nbOutput, nbPosPrint, listPosPrint, settings[6]);
   InOut::writeOuput(hngd, path_exec, output_name, nbNodes, nbOutput, t, 0., nbPosPrint, listPosPrint);
 
 
