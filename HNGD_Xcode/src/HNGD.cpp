@@ -1,4 +1,3 @@
-#include "HNGD.hpp"
 #include <iostream>
 
 HNGD :: HNGD(double* settings, double* physicalParameters, double xEnd, int geometry):
@@ -169,7 +168,7 @@ void HNGD :: compute()
     }
 
     // Safeguard against negative concentration
-    if(*min(new_c_ss.begin(), new_c_ss.end())<0 || *min(new_c_prec.begin(), new_c_prec.end())<0)
+    if(*min_element(new_c_ss.begin(), new_c_ss.end())<0 || *min_element(new_c_prec.begin(), new_c_prec.end())<0)
         std::cout << "/!\\ Negative Concentration /!\\ " << std::endl ;
     
     // Update the hydrogen profiles

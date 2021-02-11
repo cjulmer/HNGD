@@ -75,7 +75,7 @@ void Diffusion :: computeFlux()
 				flux_fick = - _coeff_Fick[k] * _dC_dx[k] ;
 				flux_soret = - _coeff_Fick[k] * _Q * _avgCss * _dT_dx[k] / (R * pow(_avgtemp, 2)) ;
 
-				_flux[k] = flux_fick + flux_soret ;
+				_flux[k] = flux_fick + flux_soret;
 			}
     	}
     else

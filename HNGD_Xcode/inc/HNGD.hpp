@@ -14,6 +14,7 @@
 #include "Nucleation.hpp"
 #include "Growth.hpp"
 #include "Dissolution.hpp"
+#include <algorithm>
 
 class HNGD
 {
