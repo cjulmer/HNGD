@@ -92,10 +92,20 @@ void Diffusion :: computeFlux()
 
 double  Diffusion :: timeStep()
 {
+	double dt ;
     // The time step associated with diffusion is computed using the convergence criterion from finite element theory
-    double dt = pow((*_positions)[1] - (*_positions)[0], 2) / (2 * _coeff_Fick[0]) ;
-    for(int k=2; k<_nbCells; k++)
-        dt = min(dt, pow((*_positions)[k] - (*_positions)[k-1], 2) / (2 * _coeff_Fick[k]));
+    if (_geometry>0)
+	{	// Polar, need radius
+		dt = pow(_radius*((*_positions)[1] - (*_positions)[0]), 2) / (2 * _coeff_Fick[0]) ;
+		for(int k=2; k<_nbCells; k++)
+			dt = min(dt, pow(_radius*((*_positions)[k] - (*_positions)[k-1]), 2) / (2 * _coeff_Fick[k]));
+	}
+    else
+    {	// Linear
+    	dt = pow((*_positions)[1] - (*_positions)[0], 2) / (2 * _coeff_Fick[0]) ;
+        for(int k=2; k<_nbCells; k++)
+            dt = min(dt, pow((*_positions)[k] - (*_positions)[k-1], 2) / (2 * _coeff_Fick[k]));
+    }
     
     return dt ;
 }
