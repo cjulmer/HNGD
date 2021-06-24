@@ -91,6 +91,11 @@ void HNGD :: getInitialConditions(vector<double> pos_hyd, vector<double> hyd_inp
     
     // Compute the initial equilibrium
     _sample->computeEquilibrium();
+
+    // Compute time step
+    if (_auto_dt)
+        //_dt = 0.1;
+        computeTimeStep();
 }
 
 

@@ -242,19 +242,21 @@ void InOut::writePhysicsInCheck(double * physicalParameters, string path_exec)
 
 // -------------------------------- Output file writing --------------------------------
 
-void InOut::writeOuput(HNGD hngd, string path_exec, string output_name, int nbNodes, int nbOutput, double t, double temp, int nbPosPrint, int* listPosPrint)
+void InOut::writeOuput(HNGD hngd, string path_exec, string output_name, int nbNodes, int nbOutput, double t, double temp, int nbPosPrint, const vector<int> & listPosPrint)
 {
     ofstream output ;
     output.open(path_exec + output_name, std::ios_base::app);
 
     /*custom*/
-    std::vector<double> listVector[nbOutput];
+    //std::vector<double> listVector[nbOutput];
+    std::vector<std::vector<double>> listVector(nbOutput);
     listVector[0] = hngd.returnSample()->returnTotalContent();
     listVector[1] = hngd.returnSample()->returnSolutionContent();
     listVector[2] = hngd.returnSample()->returnHydrideContent();
     listVector[3] = hngd.returnSample()->returnTSSd();
     listVector[4] = hngd.returnSample()->returnTSSp();
 
+    output << "\n";
     output << hngd.returnTimeStep() << "," << t << ","  ;
     for(int i=0; i<nbOutput; i++){
         for(int j=0; j<nbPosPrint; j++)
@@ -263,15 +265,13 @@ void InOut::writeOuput(HNGD hngd, string path_exec, string output_name, int nbNo
         }
         output << ',' ;
     }
-    output << "\n"   ;
-
-
+    
     cout << "t= " << t << "s"<< endl;
 
     output.close();
 }
 
-void InOut :: writeInitialOutput(HNGD hngd, string path_exec, string output_name, int nbNodes, int nbOutput, int nbPosPrint, int* listPosPrint, int geometry)
+void InOut :: writeInitialOutput(HNGD hngd, string path_exec, string output_name, int nbNodes, int nbOutput, int nbPosPrint, vector<int> & listPosPrint, int geometry)
 {
   ofstream output ;
   output.open(path_exec + output_name, std::ios_base::app);
@@ -281,23 +281,28 @@ void InOut :: writeInitialOutput(HNGD hngd, string path_exec, string output_name
         std::vector<double> positionVector = hngd.returnSample()->returnPosition();
 
         // Defining the positions where the values will be printed
-        for(int i=0; i<nbNodes; i++)
-          *(listPosPrint+i) = 0 ;
+        for (int i = 0; i < nbNodes; i++)
+            listPosPrint[i] = 0;
+          //*(listPosPrint+i) = 0 ;
 
         if(nbPosPrint==nbNodes){
-            for(int i=0; i<nbPosPrint; i++)
-              *(listPosPrint+i) = i ;
+            for (int i = 0; i < nbPosPrint; i++)
+                listPosPrint[i] = i;
+              //*(listPosPrint+i) = i ;
         }
         else{
             for(int i=1; i<nbPosPrint-1; i++){
-              while(positionVector[listPosPrint[i]] <= i*positionVector[nbNodes-1]/nbPosPrint)
-                *(listPosPrint+i) += 1 ;
+                while (positionVector[listPosPrint[i]] <= i * positionVector[nbNodes - 1] / nbPosPrint)
+                    listPosPrint[i] += 1;
+                  //*(listPosPrint+i) += 1 ;
             }
-            *(listPosPrint+nbPosPrint-1) = nbNodes-1;
+            //*(listPosPrint+nbPosPrint-1) = nbNodes-1;
+            listPosPrint[nbPosPrint - 1] = nbNodes - 1;
         }
       
       output << "dt [s],Time [s]," ;
-      string listOutputNames[nbOutput];
+      //string listOutputNames[nbOutput];
+      std::vector<string> listOutputNames(nbOutput);
       /*custom*/
       listOutputNames[0] = "Ctot," ;
       listOutputNames[1] = "Css,"  ;

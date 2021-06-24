@@ -10,6 +10,11 @@
 #include <vector>
 #include <math.h>
 
+// Microsoft VS doesn't automatically define M_PI in math.h
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
 using namespace std ;
 
 class Sample
