@@ -60,13 +60,13 @@ int main(int argc, char* argv[])
   //----------------------- DEFINE EXECUTION FOLDER AND INPUT FILES NAMES --------------------
 
   // Path to the folder to use /*custom*/
-  string path_exec = "C:\\Users\\chris\\Projects\\HNGD\\HNGD_Xcode\\" ;
+  string path_exec = "C:\\Users\\username\\Projects\\HNGD\\HNGD_Xcode\\" ;
 
   // Name of the folder containing the input files.
   // The input files specified by the argument given at
   // launch must be placed in this folder
   string input_folder = "input_files\\" ;
-
+  
   // Name of the simulation case
   string name ;
 
@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
 
   // Initialize the output file
   const short int nbOutput = 5 ; /*custom*/
-  int listPosPrint[nbPosPrint] ;
+  std::vector<int> listPosPrint(nbPosPrint);
   InOut::writeInitialOutput(hngd, path_exec, output_name, nbNodes, nbOutput, nbPosPrint, listPosPrint, settings[6]); //TODO: less parameters
   InOut::writeOuput(hngd, path_exec, output_name, nbNodes, nbOutput, t, 0., nbPosPrint, listPosPrint);
 
